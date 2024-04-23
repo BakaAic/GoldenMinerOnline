@@ -80,7 +80,6 @@ class Server:
         while True:
             client,addr=self.server.accept()
             Log.print('Client connected: '+str(addr[0]))
-            client.send(pack((pack(Map),pack(Block),pack(Wall)))+b'^&')
             if len(self.clients)==0 and self.game==None:
                 self.game=Game()
                 Log.print('Game created')
