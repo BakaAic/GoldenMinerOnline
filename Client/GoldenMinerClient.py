@@ -1,6 +1,5 @@
 import socket
 import pygame
-import time
 import math
 import pickle
 import queue
@@ -9,7 +8,6 @@ from tkinter.ttk import *
 from tkinter import messagebox
 import threading
 import traceback
-# from GameMap import *
 
 Map=None
 Block=None
@@ -298,8 +296,8 @@ class MainGame():
             img=pygame.transform.scale(img,(size*self.gameRule.map.BlockSize,size*self.gameRule.map.BlockSize))
             self.window.blit(img,block.offset_pos)
             
-            pygame.draw.rect(self.window,(255,0,0),(*block.offset_pos,block.actual_size,block.actual_size),2)            
-            pygame.draw.rect(self.window,(0,255,0),(*block.pos,1,1),5)
+            # pygame.draw.rect(self.window,(255,0,0),(*block.offset_pos,block.actual_size,block.actual_size),2)            
+            # pygame.draw.rect(self.window,(0,255,0),(*block.pos,1,1),5)
             
         self.costShowWindow()
         
