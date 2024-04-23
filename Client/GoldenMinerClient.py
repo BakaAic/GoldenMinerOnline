@@ -843,5 +843,10 @@ class GameRule:
                 
 
 if __name__ == '__main__':
-    main=MainGame()
-    main()
+    try:
+        main=MainGame()
+        main()
+    except:
+        with open('error.log','w') as f:
+            traceback.print_exc(file=f)
+        raise SystemExit
