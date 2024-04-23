@@ -90,7 +90,7 @@ class Block:
         elif self.type=='gold':
             self.cost=3*self.size
         elif self.type=='diamond':
-            self.cost=30
+            self.cost=20
             self.size=1
         elif self.type=='boom':
             self.cost=-10
