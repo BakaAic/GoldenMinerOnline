@@ -8,10 +8,7 @@ from tkinter.ttk import *
 from tkinter import messagebox
 import threading
 import traceback
-
-Map=None
-Block=None
-Wall=None
+from GameMap import *
 
 def pack(data):
     return pickle.dumps(data)
@@ -20,7 +17,7 @@ def unpack(data):
     try:
         return pickle.loads(data)
     except Exception as e:
-        traceback.print_exc()
+        traceback.print_exc(file=open('error_unpack.log','a'))
         return None
     
 def safe_getattr(obj,value,default='default'):
@@ -28,6 +25,7 @@ def safe_getattr(obj,value,default='default'):
         if obj==None:
             return default
         else:
+            
             return getattr(obj,value)
     except:
         return default
@@ -57,7 +55,12 @@ class ServerInterface:
     def listenServer(self,gameQueue):
         try:
             while self.client:
-                data=self.client.recv(10240)
+                _data=b''
+                while _data[-2:]!=b'^&':
+                    _data+=self.client.recv(1024)
+                
+                data=_data
+                # data=self.client.recv(10240)
                 if not data:
                     break
                 _tmp=data.split(b'^&')
@@ -147,32 +150,19 @@ class MainGame():
         self.client=None
         self.server.close()
         self.thread.join()
-        exit()
+        quit()
         
     def build(self):
-        global Map,Block,Wall
         self.thread=threading.Thread(target=self.serverInterface.listenServer,args=(self.gameQueue,))
         self.thread.start()
-        try:
-            ClassPack=self.gameQueue.get()
-            ClassPack=ClassPack.split(b'^&')
-            for i in ClassPack[1:]:
-                self.gameQueue.put(i)
-            ClassPack=ClassPack[0]
-        except queue.Empty:
-            pass
-        else:
-            try:
-                ClassContent=unpack(ClassPack)
-                Map,Block,Wall=list(map(unpack,ClassContent))
-            except Exception as e:
-                traceback.print_exc()
-                messagebox.showerror("Error","Cannot get Map class from server!")
-                self.exit()
         self.serverInterface.send(action='login',info=self.nick)
         self.window=pygame.display.set_mode((self.width,self.height) ,pygame.FULLSCREEN)        
         pygame.display.set_caption("Golden Miner")
-        self.mainloop()
+        try:
+            self.mainloop()
+        except:
+            traceback.print_exc(file=open('error.log','a'))
+            self.exit()
         
     def rebuild(self):
         pygame.init()
@@ -493,6 +483,8 @@ class MainGame():
                 ret=self.gameQueue.get(block=False)
             except queue.Empty:
                 pass
+            except Exception as e:
+                traceback.print_exc(file=open('error.log','a'))
             else:
                 self.gameRule.ruleParse(ret)            
             
@@ -843,10 +835,5 @@ class GameRule:
                 
 
 if __name__ == '__main__':
-    try:
-        main=MainGame()
-        main()
-    except:
-        with open('error.log','w') as f:
-            traceback.print_exc(file=f)
-        raise SystemExit
+    main=MainGame()
+    main()
